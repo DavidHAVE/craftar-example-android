@@ -82,7 +82,7 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARRes
 		mCloudRecognition.setResponseHandler(this); //Tell the cloud recognition who will receive the responses from the cloud
 		mCloudRecognition.setCollectionToken(COLLECTION_TOKEN); //Tell the cloud-recognition which token to use from the finder mode
 		
-		
+		mCloudRecognition.setItemsFactory(new MyItemFactory(getApplicationContext()));
 		
 		//Start finder mode
 		mCloudRecognition.startFinding();
