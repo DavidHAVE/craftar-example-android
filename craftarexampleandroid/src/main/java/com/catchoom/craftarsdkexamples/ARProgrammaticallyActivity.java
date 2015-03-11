@@ -43,7 +43,7 @@ import com.craftar.CraftARSearchResponseHandler;
 import com.craftar.CraftARTracking;
 import com.craftar.ImageRecognition;
 
-public class ARProgrammaticallyActivity extends CraftARActivity implements CraftARSearchResponseHandler, ImageRecognition.SetCollectionListener {
+public class ARProgrammaticallyActivity extends CraftARActivity implements CraftARSearchResponseHandler, ImageRecognition.SetCollectionListener, View.OnClickListener {
 
 	private final String TAG = "ARProgrammaticallyActivity";
 
@@ -52,6 +52,11 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 	CraftARSDK mCraftARSDK;
 	CraftARTracking mTracking;
 	CraftARCloudRecognition mCloudIR;
+
+
+	private CraftARItemAR myARItem;
+	private boolean isPinned = false;
+	private boolean isTrackingEnabled = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -65,6 +70,8 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 		setContentView(mainLayout);
 
 		mScanningLayout = findViewById(R.id.layout_scanning);
+
+		findViewById(R.id.pin_to_screen).setOnClickListener(this);
 
 		/**
 		 * Get the CraftAR SDK instance and initialize the capture
@@ -152,7 +159,7 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 				mCraftARSDK.stopFinder();
 
 				// Cast the found item to an AR item
-				CraftARItemAR myARItem = (CraftARItemAR)item;
+				myARItem = (CraftARItemAR)item;
 				// Add content to the tracking SDK and start AR experience
 				try {
 
@@ -186,6 +193,22 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 		 * device to a textureless surface or when there is connectivity issues.
 		 */
 		Log.d(TAG, "Search failed :"+craftARError.getErrorMessage());
+	}
+
+
+	@Override
+	public void onClick(View v) {
+		if (!isPinned && isTrackingEnabled) {
+			myARItem.setDrawOffTracking(true);
+			mTracking.stopTracking();
+			isPinned = true;
+		} else if (myARItem != null){
+			myARItem.setDrawOffTracking(false);
+			isPinned = false;
+			mTracking.startTracking();
+			isTrackingEnabled = true;
+
+		}
 	}
 
 	@Override
