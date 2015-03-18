@@ -55,7 +55,7 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 
 
 	private CraftARItemAR myARItem;
-	private boolean isPinned = false;
+	private boolean isAttachedToScreen = false;
 	private boolean isTrackingEnabled = false;
 
 	@Override
@@ -71,7 +71,7 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 
 		mScanningLayout = findViewById(R.id.layout_scanning);
 
-		findViewById(R.id.pin_to_screen).setOnClickListener(this);
+		findViewById(R.id.attach_to_screen).setOnClickListener(this);
 
 		/**
 		 * Get the CraftAR SDK instance and initialize the capture
@@ -198,13 +198,13 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 
 	@Override
 	public void onClick(View v) {
-		if (!isPinned && isTrackingEnabled) {
+		if (!isAttachedToScreen && isTrackingEnabled) {
 			myARItem.setDrawOffTracking(true);
 			mTracking.stopTracking();
-			isPinned = true;
+			isAttachedToScreen = true;
 		} else if (myARItem != null){
 			myARItem.setDrawOffTracking(false);
-			isPinned = false;
+			isAttachedToScreen = false;
 			mTracking.startTracking();
 			isTrackingEnabled = true;
 
