@@ -41,6 +41,8 @@ import com.craftar.CraftARResponseHandler;
 import com.craftar.CraftARSDK;
 import com.craftar.CraftARSDKException;
 import com.craftar.CraftARTracking;
+import com.craftar.CraftARTrackingContent;
+import com.craftar.CraftARTrackingContentVideo;
 
 public class ARFromCraftARActivity extends CraftARActivity implements CraftARResponseHandler,CraftARImageHandler {
 
@@ -81,7 +83,7 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARRes
 		mCloudRecognition.setResponseHandler(this); //Tell the cloud recognition who will receive the responses from the cloud
 		mCloudRecognition.setCollectionToken(COLLECTION_TOKEN); //Tell the cloud-recognition which token to use from the finder mode
 		
-		mCloudRecognition.setItemsFactory(new MyItemFactory(getApplicationContext()));
+		mCloudRecognition.setItemsFactory(new MyItemFactory());
 		
 		//Start finder mode
 		mCloudRecognition.startFinding();
@@ -103,7 +105,11 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARRes
 				mCloudRecognition.stopFinding();
 				
 				// Cast the found item to an AR item
-				CraftARItemAR myARItem = (CraftARItemAR)item;
+				MyARItem myARItem = (MyARItem)item;
+				
+				// Draw contents even if tracking is lost
+				myARItem.setDrawOffTracking(true);
+				
 				// Add content to the tracking SDK and start AR experience
 				try {
 					mCraftARTracking.addItem(myARItem);
