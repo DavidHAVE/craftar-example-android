@@ -1,4 +1,4 @@
-package com.catchoom.catchoomexamples;
+package com.craftar.craftarexamples;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,15 +10,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-import com.catchoom.CatchoomARItem;
-import com.catchoom.CatchoomSDKException;
+import com.craftar.CraftARItemAR;
+import com.craftar.CraftARSDKException;
 
-public class MyARItem extends CatchoomARItem {
+public class MyARItem extends CraftARItemAR {
 
 	private Context mContext;
 	private String mVideoURL;
 	
-	public MyARItem(JSONObject object, Context context) throws CatchoomSDKException {
+	public MyARItem(JSONObject object, Context context) throws CraftARSDKException {
 		super(object);
 		mContext = context;
 		mVideoURL = getVideoURLFromJSON(object);

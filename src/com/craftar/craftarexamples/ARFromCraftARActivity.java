@@ -46,7 +46,6 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARRes
 
 	private final String TAG = "CraftARTrackingExample";
 	private final static String COLLECTION_TOKEN="craftarexamples1";
-	//private final static String COLLECTION_TOKEN="craftardebugging";
 	
 	private View mScanningLayout;
 	
