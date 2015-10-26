@@ -65,10 +65,8 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 
 	@Override
 	public void onPostCreate() {
-
 		View mainLayout = getLayoutInflater().inflate(R.layout.activity_recognition_only, null);
 		setContentView(mainLayout);
-
 
 		mScanningLayout = findViewById(R.id.layout_scanning);
 		mTapToScanLayout = findViewById(R.id.tap_to_scan);
@@ -87,7 +85,7 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 	}
 
 	@Override
-	public void onPreviewStarted(int i, int i1) {
+	public void onPreviewStarted(int frameWidth, int frameHeight) {
 
 	}
 
@@ -104,18 +102,19 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 	}
 
 	@Override
-	public void setCollectionProgress(double v) {
+	public void setCollectionProgress(double progress) {
 		// Not used for Cloud IR
 	}
 
 	@Override
-	public void searchResults(ArrayList<CraftARResult> results, long l, int i) {
+	public void searchResults(ArrayList<CraftARResult> results, long searchTime, int requestCode) {
+		mCraftARSDK.getCamera().restartCapture();
 		mScanningLayout.setVisibility(View.GONE);
+		mTapToScanLayout.setVisibility(View.VISIBLE);
+
 		if(results.size()==0){
 			Log.d(TAG,"Nothing found");
 			Toast.makeText(getBaseContext(),getString(R.string.recognition_only_toast_nothing_found), Toast.LENGTH_SHORT).show();
-			mTapToScanLayout.setVisibility(View.VISIBLE);
-			mCraftARSDK.getCamera().restartCapture();
 		}else{
 			CraftARResult result = results.get(0);
 			CraftARItem item = result.getItem();
@@ -124,8 +123,6 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 				if((url!= null)&&(! url.isEmpty())){
 					Intent launchBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 					startActivity(launchBrowser);
-					mTapToScanLayout.setVisibility(View.VISIBLE);
-					mCraftARSDK.getCamera().restartCapture();
 				}
 			}
 			Log.d(TAG,"Found item "+item.getItemName());
