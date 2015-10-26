@@ -45,7 +45,7 @@ import java.util.ArrayList;
 public class RecognitionOnlyActivity extends CraftARActivity implements CraftARSearchResponseHandler, ImageRecognition.SetCollectionListener, View.OnClickListener {
 
 	private final String TAG = "RecognitionOnlyActivity";
-	private final static String COLLECTION_TOKEN="d523d576df0c491e";
+	private final static String COLLECTION_TOKEN="craftarexamples1";
 
 	private View mScanningLayout;
 	private View mTapToScanLayout;

@@ -49,7 +49,7 @@ import java.io.File;
 public class OnDeviceARActivity extends CraftARActivity implements CraftAROnDeviceCollectionManager.AddCollectionListener, CraftARTouchEventInterface.OnContentClickListener, CraftARTouchEventInterface.OnTouchEventListener {
 
 	private final String TAG = "OnDeviceARActivity";
-	private final static String COLLECTION_TOKEN="d523d576df0c491e";
+	private final static String COLLECTION_TOKEN="craftarexamples1";
 
 
 	CraftARTracking mTracking;

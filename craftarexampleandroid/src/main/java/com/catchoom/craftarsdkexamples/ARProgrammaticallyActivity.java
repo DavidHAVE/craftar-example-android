@@ -45,7 +45,7 @@ import com.craftar.ImageRecognition;
 public class ARProgrammaticallyActivity extends CraftARActivity implements CraftARSearchResponseHandler, ImageRecognition.SetCollectionListener {
 
 	private final String TAG = "ARProgrammaticallyActivity";
-	private final static String COLLECTION_TOKEN="d523d576df0c491e";
+	private final static String COLLECTION_TOKEN="craftarexamples1";
 
 	private View mScanningLayout;
 
