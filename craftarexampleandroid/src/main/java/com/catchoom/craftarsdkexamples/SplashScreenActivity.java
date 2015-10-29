@@ -53,6 +53,9 @@ public class SplashScreenActivity extends Activity implements AddCollectionListe
 
 		CraftARSDK.Instance().init(getApplicationContext());
 		
+		/** We will load the collection for On Device AR ( 4th example). 
+		 * If you use Cloud AR, you don't need to add the collection*/
+
 		CraftAROnDeviceCollectionManager collectionManager = CraftAROnDeviceCollectionManager.Instance();
 
         /**
