@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.craftar.CraftARActivity;
 import com.craftar.CraftARCloudRecognition;
@@ -45,15 +46,12 @@ import com.craftar.ImageRecognition;
 public class ARProgrammaticallyActivity extends CraftARActivity implements CraftARSearchResponseHandler, ImageRecognition.SetCollectionListener {
 
 	private final String TAG = "ARProgrammaticallyActivity";
-	private final static String COLLECTION_TOKEN="craftarexamples1";
 
 	private View mScanningLayout;
 
-
-	CraftARTracking mTracking;
 	CraftARSDK mCraftARSDK;
+	CraftARTracking mTracking;
 	CraftARCloudRecognition mCloudIR;
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -74,14 +72,15 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 		 *
 		 * When the capture is ready onPreviewStarted() will be called.
 		 */
-		mCraftARSDK = CraftARSDK.Instance();
+		mCraftARSDK =  CraftARSDK.Instance();
 		mCraftARSDK.startCapture(this);
+
 
 		/**
 		 * Get the Cloud Image Recognition instance and set this class
 		 * as the one to receive search responses.
 		 */
-		mCloudIR = CraftARCloudRecognition.init(this);
+		mCloudIR = CraftARCloudRecognition.Instance();
 		mCloudIR.setCraftARSearchResponseHandler(this);
 
 		/**
@@ -95,24 +94,22 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 		/**
 		 * Get the Tracking instance for the AR.
 		 */
-		mTracking = CraftARTracking.Instance(this);
+		mTracking = CraftARTracking.Instance();
 
 	}
 
 	@Override
 	public void onPreviewStarted(int width, int height) {
-		Log.d(TAG,"onPreviewStarted in "+this);
 		/**
 		 * Set the collection we want to search with the COLLECITON_TOKEN.
 		 * When the collection is ready, the collectionReady callback will be triggered.
 		 */
-		mCloudIR.setCollection(COLLECTION_TOKEN, this);
+		mCloudIR.setCollection(Config.MY_COLLECTION_TOKEN, this);
 	}
 
 
 	@Override
 	public void collectionReady() {
-		Log.d(TAG, "ARProgramaticallyActivity startFinder() in"+this);
 		/**
 		 * Start searching in finder mode. The searchResults() method of the
 		 * CraftARSearchResponseHandler previously set to the SDK will be triggered when some results
@@ -128,11 +125,6 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 		 * when the token is wrong or there is no internet connection.
 		 */
 		Log.d(TAG, "search failed! " + craftARError.getErrorMessage());
-	}
-
-	@Override
-	public void setCollectionProgress(double v) {
-		// Not used for Cloud IR
 	}
 
 	@Override
@@ -193,12 +185,11 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 		 * Called when a search fails. This happens usually when pointing the
 		 * device to a textureless surface or when there is connectivity issues.
 		 */
-		Log.d(TAG,"search failed!");
+		Log.d(TAG, "Search failed :"+craftARError.getErrorMessage());
 	}
 
 	@Override
 	public void finish() {
-		Log.d(TAG,"Finish in"+this);
 		/**
 		 * Stop Searching, Tracking and clean the AR scene
 		 */
@@ -206,6 +197,11 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 		mTracking.stopTracking();
 		mTracking.removeAllItems();
 		super.finish();
+	}
+
+	@Override
+	public void onCameraOpenFailed() {
+		Toast.makeText(getApplicationContext(), "Camera error", Toast.LENGTH_SHORT).show();		
 	}
 	
 

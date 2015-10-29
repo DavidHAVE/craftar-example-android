@@ -22,6 +22,8 @@
 
 package com.catchoom.craftarsdkexamples;
 
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,8 +42,6 @@ import com.craftar.CraftARSearchResponseHandler;
 import com.craftar.CraftARTracking;
 import com.craftar.ImageRecognition;
 
-import java.util.ArrayList;
-
 public class RecognitionOnlyActivity extends CraftARActivity implements CraftARSearchResponseHandler, ImageRecognition.SetCollectionListener, View.OnClickListener {
 
 	private final String TAG = "RecognitionOnlyActivity";
@@ -58,8 +58,6 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		CLog.showDebugLogs = true;
-		CLog.showVerboseLogs = true;
 		super.onCreate(savedInstanceState);
 	}
 
@@ -72,21 +70,19 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 		mTapToScanLayout = findViewById(R.id.tap_to_scan);
 		mTapToScanLayout.setOnClickListener(this);
 
+		mTracking = CraftARTracking.Instance();
+
 		mCraftARSDK = CraftARSDK.Instance();
 		mCraftARSDK.startCapture(this);
-
-		mCloudIR = CraftARCloudRecognition.init(this);
-		mCloudIR.setCraftARSearchResponseHandler(this);
-		mCloudIR.setCollection(COLLECTION_TOKEN, this);
-		mCraftARSDK.setSearchController(mCloudIR.getSearchController());
-
-		mTracking = CraftARTracking.Instance(this);
-
 	}
+
 
 	@Override
 	public void onPreviewStarted(int frameWidth, int frameHeight) {
-
+		mCloudIR = CraftARCloudRecognition.Instance();
+		mCloudIR.setCraftARSearchResponseHandler(this);
+		mCloudIR.setCollection(COLLECTION_TOKEN, this);
+		mCraftARSDK.setSearchController(mCloudIR.getSearchController());
 	}
 
 
@@ -99,11 +95,6 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 	@Override
 	public void setCollectionFailed(CraftARError craftARError) {
 		Log.d(TAG, "search failed! " + craftARError.getErrorMessage());
-	}
-
-	@Override
-	public void setCollectionProgress(double progress) {
-		// Not used for Cloud IR
 	}
 
 	@Override
@@ -131,7 +122,7 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 	}
 
 	@Override
-	public void searchFailed(CraftARError craftARError, int i) {
+	public void searchFailed(CraftARError craftARError, int requestCode) {
 		Log.d(TAG,"search failed!");
 		Toast.makeText(getBaseContext(), getString(R.string.recognition_only_toast_nothing_found), Toast.LENGTH_SHORT).show();
 		mScanningLayout.setVisibility(View.GONE);
@@ -146,5 +137,10 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 			mScanningLayout.setVisibility(View.VISIBLE);
 			mCraftARSDK.singleShotSearch();
 		}
+	}
+
+	@Override
+	public void onCameraOpenFailed() {
+		Toast.makeText(getApplicationContext(), "Camera error", Toast.LENGTH_SHORT).show();
 	}
 }

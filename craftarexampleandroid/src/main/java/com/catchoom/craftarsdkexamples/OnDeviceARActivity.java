@@ -27,30 +27,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.craftar.CLog;
 import com.craftar.CraftARActivity;
-import com.craftar.CraftARContent;
-import com.craftar.CraftARContentImageButton;
-import com.craftar.CraftARError;
 import com.craftar.CraftARItem;
 import com.craftar.CraftARItemAR;
 import com.craftar.CraftAROnDeviceCollection;
 import com.craftar.CraftAROnDeviceCollectionManager;
 import com.craftar.CraftARSDK;
 import com.craftar.CraftARSDKException;
-import com.craftar.CraftARTouchEventInterface;
-import com.craftar.CraftARTouchEventInterface.OnContentClickListener;
-import com.craftar.CraftARTouchEventInterface.OnTouchEventListener;
 import com.craftar.CraftARTracking;
 
-import java.io.File;
 
-
-public class OnDeviceARActivity extends CraftARActivity implements CraftAROnDeviceCollectionManager.AddCollectionListener, CraftARTouchEventInterface.OnContentClickListener, CraftARTouchEventInterface.OnTouchEventListener {
+public class OnDeviceARActivity extends CraftARActivity {
 
 	private final String TAG = "OnDeviceARActivity";
-	private final static String COLLECTION_TOKEN="craftarexamples1";
-
 
 	CraftARTracking mTracking;
 	CraftARSDK mCraftARSDK;
@@ -61,8 +50,6 @@ public class OnDeviceARActivity extends CraftARActivity implements CraftAROnDevi
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
-    	CLog.showDebugLogs = true;
-    	CLog.showVerboseLogs = true;
 		super.onCreate(savedInstanceState);
 	}
 		
@@ -80,105 +67,24 @@ public class OnDeviceARActivity extends CraftARActivity implements CraftAROnDevi
          */
 		mCraftARSDK = CraftARSDK.Instance();
 		mCraftARSDK.startCapture(this);
-		mCraftARSDK.setOnContentClickListener(new OnContentClickListener() {
-			
-			@Override
-			public void onClick(CraftARContent content) {
-				Log.d(TAG,"onClick in "+content);				
-			}
-		});
-
-		mCraftARSDK.setOnContentTouchListener(new OnTouchEventListener() {
-			
-			@Override
-			public void onTouchUp(CraftARContent content) {
-				Log.d(TAG,"OnTouchUp in "+content);				
-			}
-			
-			@Override
-			public void onTouchOut(CraftARContent content) {
-				Log.d(TAG,"OnTouchOut in "+content);				
-			}
-			
-			@Override
-			public void onTouchIn(CraftARContent content) {
-				Log.d(TAG,"OnTouchIn in "+content);				
-			}
-			
-			@Override
-			public void onTouchDown(CraftARContent content) {
-				Log.d(TAG,"OnTouchDown in "+content);				
-			}
-		}); 
-
-        /**
-         * Get the instance of the On-device Collection Manager.
-         * This class manages on-device AR collections allowing to add them to the
-         * device from a bundle zip file.
-         */
-        mCollectionManager = CraftAROnDeviceCollectionManager.init(this);
-
         /**
          * Get the instance of the Tracking
          */
-		mTracking = CraftARTracking.Instance(this);
+		mTracking = CraftARTracking.Instance();
 		
 	}
 
 
     @Override
     public void onPreviewStarted(int width,int height){
-        Log.d(TAG, "OnPreviewStarted in MainActivity");
 
+        mCollection =  CraftAROnDeviceCollectionManager.Instance().get(Config.MY_COLLECTION_TOKEN);
         /**
-         * The on-device collection may already be added to the device (we just add it once)
-         * we can use the token to retrieve it.
+         * As the on-device collection is already in the device (we did it in the Splash Screen), we will add the collection items
+         * to the tracking and start the AR experience.
          */
-        mCollection =  mCollectionManager.get(COLLECTION_TOKEN);
-
-        if(mCollection != null){
-            /**
-             * If the on-device collection is already in the device, we will add the collection items
-             * to the tracking and start the AR experience.
-             */
-            loadCollection();
-        }else{
-            /**
-             * If not, we get the path for the bundle and add the collection to the device first.
-             * The addCollection  method receives an AddCollectionListener instance that will receive
-             * the callbacks when the collection is ready.
-             */
-            String bundlePath = getApplicationContext().getExternalFilesDir(null) + "/arbundle.zip";
-            File bundleFile = new File(bundlePath);
-            mCollectionManager.addCollection(bundleFile, this);
-        }
-    }
-
-    @Override
-    public void collectionAdded(CraftAROnDeviceCollection collection) {
-        showToast("Collection " + collection.getName() + " added!", Toast.LENGTH_SHORT);
-
-        /**
-         * The collection is on the device and ready to use!
-         * Keep a reference to the collection and add its items to the
-         * tracking and start the AR experience.
-         */
-        mCollection = collection;
         loadCollection();
-    }
-
-    @Override
-    public void addCollectionFailed(CraftARError craftARError) {
-        Log.e(TAG, "Error adding collection: " + craftARError.getErrorMessage());
-
-    }
-
-    @Override
-    public void addCollectionProgress(float v) {
-        /**
-         * For large on-device collections, the add process can take some time. Here we provide an
-         * estimate of the percentage of completeness of this operation.
-         */
+ 
     }
 
     private void loadCollection() {
@@ -189,23 +95,9 @@ public class OnDeviceARActivity extends CraftARActivity implements CraftAROnDevi
             if(item.isAR()){
                 CraftARItemAR itemAR = (CraftARItemAR)item;
                 try {
-
-                    /**
-                     * We can receive callbacks from touch events on AR contents.
-                     */
-                    for(CraftARContent content:itemAR.getContents()){
-                        boolean isButton = content instanceof CraftARContentImageButton;
-                        if(!isButton){
-                            // for clicks
-                            content.setContentClickListener(this);
-                            // and touch (up, down, in, out) events
-                            content.setContentTouchEventListener(this);
-                        }
-                    }
-
                     // Add the item to the tracking
                     Log.d(TAG, "Adding item "+item.getItemName()+" for tracking");
-                    mTracking.addItem((CraftARItemAR)item);
+                    mTracking.addItem(itemAR);
                 } catch (CraftARSDKException e) {
                     showToast(e.getMessage(),Toast.LENGTH_SHORT);
                     e.printStackTrace();
@@ -214,31 +106,6 @@ public class OnDeviceARActivity extends CraftARActivity implements CraftAROnDevi
         }
         // Start tracking this collection.
         mTracking.startTracking();
-    }
-
-    @Override
-    public void onClick(CraftARContent craftARContent) {
-        showToast("Content clicked!", Toast.LENGTH_SHORT);
-    }
-
-    @Override
-    public void onTouchIn(CraftARContent craftARContent) {
-        showToast("Content onTouchIn!", Toast.LENGTH_SHORT);
-    }
-
-    @Override
-    public void onTouchOut(CraftARContent craftARContent) {
-        showToast("Content onTouchOut!", Toast.LENGTH_SHORT);
-    }
-
-    @Override
-    public void onTouchDown(CraftARContent craftARContent) {
-        showToast("Content onTouchDown!", Toast.LENGTH_SHORT);
-    }
-
-    @Override
-    public void onTouchUp(CraftARContent craftARContent) {
-        showToast("Content onTouchUp!", Toast.LENGTH_SHORT);
     }
 
     private void showToast(String toastText, int toastDuration) {
@@ -259,4 +126,10 @@ public class OnDeviceARActivity extends CraftARActivity implements CraftAROnDevi
         mTracking.removeAllItems();
         super.finish();
     }
+
+	@Override
+	public void onCameraOpenFailed() {
+		Toast.makeText(getApplicationContext(), "Camera error", Toast.LENGTH_SHORT).show();				
+		
+	}
 }

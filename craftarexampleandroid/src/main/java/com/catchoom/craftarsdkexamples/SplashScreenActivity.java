@@ -28,18 +28,76 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
+import android.widget.Toast;
 
-public class SplashScreenActivity extends Activity {
+import com.craftar.CLog;
+import com.craftar.CraftARError;
+import com.craftar.CraftAROnDeviceCollection;
+import com.craftar.CraftAROnDeviceCollectionManager;
+import com.craftar.CraftAROnDeviceCollectionManager.AddCollectionListener;
+import com.craftar.CraftARSDK;
 
+public class SplashScreenActivity extends Activity implements AddCollectionListener{
+
+	private final static String TAG = "SplashScreenActivity";
 	private static final long SPLASH_SCREEN_DELAY = 1000;
-
+	public final static String TOKEN = "craftarexamples1";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.splash_screen);
 
+		CraftARSDK.Instance().init(getApplicationContext());
+		
+		CraftAROnDeviceCollectionManager collectionManager = CraftAROnDeviceCollectionManager.Instance();
+
+        /**
+         * The on-device collection may already be added to the device (we just add it once)
+         * we can use the token to retrieve it.
+         */
+		CraftAROnDeviceCollection collection = collectionManager.get(Config.MY_COLLECTION_TOKEN);
+		if(collection != null){
+			startLaunchersActivity();
+
+		}else{
+			/**
+           * If not, we get the path for the bundle and add the collection to the device first.
+           * The addCollection  method receives an AddCollectionListener instance that will receive
+           * the callbacks when the collection is ready.
+           */
+			collectionManager.addCollection("arbundle.zip", this);
+			
+			//Alternatively, you can also download the collection from CraftAR using the token, instead of embedding it into the app resources.
+			//collectionManager.addCollectionWithToken(TOKEN, this); 
+		}
+	}
+
+	@Override
+	public void collectionAdded(CraftAROnDeviceCollection collection) {
+		
+		/**
+         * The collection is on the device and ready to use!
+         */
+		startLaunchersActivity();
+	}
+
+	@Override
+	public void addCollectionFailed(CraftARError error) {
+		Toast.makeText(getApplicationContext(), "AddCollection failed: "+error.getErrorMessage(), Toast.LENGTH_SHORT).show();
+		finish();
+	}
+
+	@Override
+	public void addCollectionProgress(float progress) {
+		Log.d(TAG, "addCollectionProgress "+progress);
+
+	}
+	
+	private void startLaunchersActivity(){
 		TimerTask task = new TimerTask() {
 			public void run() {
 				Intent launchersActivity = new Intent( SplashScreenActivity.this, LaunchersActivity.class);
