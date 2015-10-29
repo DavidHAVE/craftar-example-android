@@ -1,0 +1,2 @@
+configurations.create("default")
+artifacts.add("default", file('craftar-augmented-reality-sdk-android-4.0.aar'))

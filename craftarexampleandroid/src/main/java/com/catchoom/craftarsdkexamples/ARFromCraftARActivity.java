@@ -22,13 +22,14 @@
 
 package com.catchoom.craftarsdkexamples;
 
-import android.os.Bundle;
+import java.util.ArrayList;
+
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
-import com.craftar.CLog;
-import com.craftar.CraftARCloudRecognition;
 import com.craftar.CraftARActivity;
+import com.craftar.CraftARCloudRecognition;
 import com.craftar.CraftARError;
 import com.craftar.CraftARItem;
 import com.craftar.CraftARItemAR;
@@ -39,34 +40,19 @@ import com.craftar.CraftARSearchResponseHandler;
 import com.craftar.CraftARTracking;
 import com.craftar.ImageRecognition;
 
-import java.util.ArrayList;
-
 
 public class ARFromCraftARActivity extends CraftARActivity implements CraftARSearchResponseHandler, ImageRecognition.SetCollectionListener {
 
 	private final String TAG = "ARFromCraftARActivity";
-	private final static String COLLECTION_TOKEN="craftarexamples1";
 
 	private View mScanningLayout;
 
-
-	CraftARTracking mTracking;
 	CraftARSDK mCraftARSDK;
+	CraftARTracking mTracking;
 	CraftARCloudRecognition mCloudIR;
-
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		CLog.showVerboseLogs = true;
-		CLog.showDebugLogs = true;
-		super.onCreate(savedInstanceState);
-		CLog.v("onCreate() in "+this);
-	}
 
 	@Override
 	public void onPostCreate() {
-
-		Log.d(TAG, "onPostCreate in "+this);
         View mainLayout = getLayoutInflater().inflate(R.layout.activity_ar_programmatically_ar_from_craftar, null);
         setContentView(mainLayout);
 
@@ -85,7 +71,7 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARSea
          * Get the Cloud Image Recognition instance and set this class
          * as the one to receive search responses.
          */
-        mCloudIR = CraftARCloudRecognition.init(this);
+        mCloudIR = CraftARCloudRecognition.Instance();
         //mCloudIR.setRequestBoundingBoxes(true); //Optional, if you want to request bounding boxes
         //mCloudIR.setEmbedCustom(true); //Optional, if you want the custom data embedded in your CraftARItems
         mCloudIR.setCraftARSearchResponseHandler(this);
@@ -101,18 +87,17 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARSea
         /**
          * Get the Tracking instance for the AR.
          */
-        mTracking = CraftARTracking.Instance(this);
+        mTracking = CraftARTracking.Instance();
 
     }
 
     @Override
     public void onPreviewStarted(int frameWidth, int frameHeight) {
-    	Log.d(TAG, "onPreviewStarted() -> width:"+frameWidth + ", height:"+frameHeight);
         /**
          * Set the collection we want to search with the COLLECITON_TOKEN.
          * When the collection is ready, the collectionReady callback will be triggered.
          */
-        mCloudIR.setCollection(COLLECTION_TOKEN, this);
+        mCloudIR.setCollection(Config.MY_COLLECTION_TOKEN, this);
     }
 
     @Override
@@ -131,13 +116,9 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARSea
          * This method is called when the setCollection method failed. This happens usually
          * when the token is wrong or there is no internet connection.
          */
-        Log.d(TAG, "search failed! " + craftARError.getErrorMessage());
+        Log.d(TAG, "SetCollection failed " + craftARError.getErrorMessage());
     }
 
-    @Override
-    public void setCollectionProgress(double progress) {
-        // Not used for Cloud IR
-    }
 
     @Override
     public void searchResults(ArrayList<CraftARResult> results, long searchTime, int requestCode) {
@@ -152,7 +133,7 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARSea
              *  - match bounding box (if requested using
              *  - item
              */
-            CraftARResult result = results.get(0);
+            CraftARResult result = results.get(0); //In this example, we get only the best result.
 
             /**
              * Get the item for this result and check if it is an AR item
@@ -182,9 +163,9 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARSea
     public void searchFailed(CraftARError craftARError, int requestCode) {
         /**
          * Called when a search fails. This happens usually when pointing the
-         * device to a textureless surface or when there is connectivity issues.
+         * device to a texture-less surface or when there are connectivity issues.
          */
-        Log.d(TAG,"search failed!");
+        Log.d(TAG,"Search failed : "+craftARError.getErrorMessage());
     }
 
     @Override
@@ -198,4 +179,9 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARSea
         super.finish();
     }
 
+	@Override
+	public void onCameraOpenFailed() {
+		Toast.makeText(getApplicationContext(), "Camera error", Toast.LENGTH_SHORT).show();				
+	}
+	
 }
