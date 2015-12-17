@@ -43,7 +43,6 @@ public class SplashScreenActivity extends Activity implements AddCollectionListe
 
 	private final static String TAG = "SplashScreenActivity";
 	private static final long SPLASH_SCREEN_DELAY = 1000;
-	public final static String TOKEN = "craftarexamples1";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +63,7 @@ public class SplashScreenActivity extends Activity implements AddCollectionListe
          */
 		CraftAROnDeviceCollection collection = collectionManager.get(Config.MY_COLLECTION_TOKEN);
 		if(collection != null){
+			Log.d(this.getClass().getSimpleName(), "Collection already added, starting launchers activity!");
 			startLaunchersActivity();
 
 		}else{
@@ -72,6 +72,7 @@ public class SplashScreenActivity extends Activity implements AddCollectionListe
            * The addCollection  method receives an AddCollectionListener instance that will receive
            * the callbacks when the collection is ready.
            */
+			Log.d(this.getClass().getSimpleName(), "Collection NOT added, adding collection");
 			collectionManager.addCollection("arbundle.zip", this);
 			
 			//Alternatively, you can also download the collection from CraftAR using the token, instead of embedding it into the app resources.

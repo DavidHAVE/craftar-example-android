@@ -45,7 +45,6 @@ import com.craftar.ImageRecognition;
 public class RecognitionOnlyActivity extends CraftARActivity implements CraftARSearchResponseHandler, ImageRecognition.SetCollectionListener, View.OnClickListener {
 
 	private final String TAG = "RecognitionOnlyActivity";
-	private final static String COLLECTION_TOKEN="craftarexamples1";
 
 	private View mScanningLayout;
 	private View mTapToScanLayout;
@@ -81,7 +80,7 @@ public class RecognitionOnlyActivity extends CraftARActivity implements CraftARS
 	public void onPreviewStarted(int frameWidth, int frameHeight) {
 		mCloudIR = CraftARCloudRecognition.Instance();
 		mCloudIR.setCraftARSearchResponseHandler(this);
-		mCloudIR.setCollection(COLLECTION_TOKEN, this);
+		mCloudIR.setCollection(Config.MY_COLLECTION_TOKEN, this);
 		mCraftARSDK.setSearchController(mCloudIR.getSearchController());
 	}
 
