@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.craftar.CraftARActivity;
+import com.craftar.CraftARError;
 import com.craftar.CraftARItem;
 import com.craftar.CraftARItemAR;
 import com.craftar.CraftAROnDeviceCollection;
@@ -94,13 +95,9 @@ public class OnDeviceARActivity extends CraftARActivity {
             CraftARItem item = mCollection.getItem(itemUUID);
             if(item.isAR()){
                 CraftARItemAR itemAR = (CraftARItemAR)item;
-                try {
-                    // Add the item to the tracking
-                    Log.d(TAG, "Adding item "+item.getItemName()+" for tracking");
-                    mTracking.addItem(itemAR);
-                } catch (CraftARSDKException e) {
-                    showToast(e.getMessage(),Toast.LENGTH_SHORT);
-                    e.printStackTrace();
+                CraftARError error = mTracking.addItem(itemAR);
+                if (error != null) {
+                    showToast(error.getErrorMessage(), Toast.LENGTH_SHORT);
                 }
             }
         }
