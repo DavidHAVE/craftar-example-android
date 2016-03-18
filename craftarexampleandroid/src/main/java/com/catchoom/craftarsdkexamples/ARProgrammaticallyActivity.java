@@ -154,24 +154,23 @@ public class ARProgrammaticallyActivity extends CraftARActivity implements Craft
 				// Cast the found item to an AR item
 				CraftARItemAR myARItem = (CraftARItemAR)item;
 				// Add content to the tracking SDK and start AR experience
-				try {
 
-					// We create a CraftARContentImage programmatically from a resource stored in the SD card.
-					String imageUrl = getApplicationContext().getExternalFilesDir(null) + "/ar_programmatically_content.png";
-					CraftARContentImage myImage = new CraftARContentImage(imageUrl);
+				// We create a CraftARContentImage programmatically from a resource stored in the SD card.
+				String imageUrl = getApplicationContext().getExternalFilesDir(null) + "/ar_programmatically_content.png";
+				CraftARContentImage myImage = new CraftARContentImage(imageUrl);
 
-					// This will make the content to be scaled to match the edges of the reference image. This doesn't keep the aspect ratio of the content.
-					myImage.setWrapMode(CraftARContent.ContentWrapMode.WRAP_MODE_SCALE_FILL);
+				// This will make the content to be scaled to match the edges of the reference image. This doesn't keep the aspect ratio of the content.
+				myImage.setWrapMode(CraftARContent.ContentWrapMode.WRAP_MODE_SCALE_FILL);
 
-					// Add the content to the AR item
-					myARItem.addContent(myImage);
+				// Add the content to the AR item
+				myARItem.addContent(myImage);
 
-					// Add the item to the tracking and start tracking.
-					mTracking.addItem(myARItem);
+				CraftARError error = mTracking.addItem(myARItem);
+				if (error == null) {
 					mTracking.startTracking();
 					mScanningLayout.setVisibility(View.GONE);
-				} catch (CraftARSDKException e) {
-					e.printStackTrace();
+				} else {
+					Log.e(TAG, error.getErrorMessage());
 				}
 
 			}

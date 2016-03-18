@@ -146,12 +146,12 @@ public class ARFromCraftARActivity extends CraftARActivity implements CraftARSea
                 // Cast the found item to an AR item
                 CraftARItemAR myARItem = (CraftARItemAR)item;
                 // Add content to the tracking SDK and start AR experience
-                try {
-                    mTracking.addItem(myARItem);
+                CraftARError error = mTracking.addItem(myARItem);
+                if (error == null) {
                     mTracking.startTracking();
                     mScanningLayout.setVisibility(View.GONE);
-                } catch (CraftARSDKException e) {
-                    e.printStackTrace();
+                } else {
+                    Log.e(TAG, error.getErrorMessage());
                 }
 
             }
